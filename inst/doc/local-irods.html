@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Mariana Montes" />
+
+<meta name="date" content="2023-11-02" />
+
+<title>Accessing data locally and in iRODS</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Accessing data locally and in iRODS</h1>
+<h4 class="author">Mariana Montes</h4>
+<h4 class="date">2023-11-02</h4>
+
+
+
+<p>If you are not familiar with iRODS, understanding how to access and
+manipulate data with it may be less than intuitive. In this vignette,
+we’ll go through the main functions for setting and changing the working
+directory and for creating, saving, reading and removing data, comparing
+R functions for manipulation of local files and the
+<code>{rirods}</code> counterparts.</p>
+<p>The main point to understand is that the iRODS server is not simply
+another location that you can access by editing a path. While you can
+use <code>file.remove()</code> to remove any file in your computer,
+there is no path you can provide that will remove a data object in
+iRODS. Instead, you need to use <code>irm()</code>, which connects to
+the iRODS server to apply the same action. This is the sort of
+comparison we will see in this vignette.</p>
+<p>A second point to keep in mind is that, normally, you need to stage
+and unstage your data in order to manipulate it, rather than modifying
+your iRODS data directly. This is always the case with other clients,
+such as iCommands: if you want to read a dataframe you have in iRODS,
+you first need to copy it to your local computer and then open
+<em>that</em> file; if you want to save a modified version of that file
+you have to copy the local (modified) version back to iRODS.
+<code>{rirods}</code> offers one exception to this by allowing to save R
+objects in RDS format (only) directly into iRODS and read them back,
+with <code>isaveRDS()</code> and <code>ireadRDS()</code>
+respectively.</p>
+<p>Finally, most of the functions in <code>{rirods}</code> are inspired
+by iCommands, which are themselves modelled after Unix commands and
+prefixed by an <code>i</code>. So, for example, the Unix command to
+<strong>c</strong>hange a <strong>d</strong>irectory is <code>cd</code>,
+its iCommands counterpart is <code>icd</code>, and then the
+<code>{rirods}</code> equivalent is <code>icd()</code>.</p>
+<div id="set-and-change-working-directory" class="section level2">
+<h2>Set and change working directory</h2>
+<p>In R we can check the working directory with <code>getwd()</code> and
+change it with <code>setwd(dir)</code>, where <code>dir</code> is the
+path we want to set as the new working directory. Both functions return
+the current working directory; before the change and invisibly in the
+case of <code>setwd()</code>.</p>
+<p>The <code>{rirods}</code> counterparts are <code>ipwd()</code>
+(“print working directory”) and <code>icd(dir)</code> (“change
+directory”) respectively.</p>
+<p>For the purposes of this vignette, we’ll use a temporary directory
+locally. This is the current output of <code>getwd()</code> and
+<code>ipwd()</code> respectively:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">getwd</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">ipwd</span>()</span></code></pre></div>
+<p>We can see their contents with <code>dir(path)</code> or
+<code>list.files(path)</code> and <code>ils(path)</code> respectively.
+If <code>path</code> is not provided, the current working directory is
+used as default:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">dir</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">ils</span>()</span></code></pre></div>
+<p>We can focus on the “data” local directory with
+<code>setwd(&quot;data&quot;)</code><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> and on the “data” iRODS collection with
+<code>icd(&quot;data&quot;)</code>. Then the output of <code>getwd()</code> and
+<code>ipwd()</code>, respectively, are updated, and <code>dir()</code>
+and <code>ils()</code> will show the contents of “data” by default.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>old_local <span class="ot">&lt;-</span> <span class="fu">setwd</span>(<span class="st">&quot;data&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">dir</span>()</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>old_irods <span class="ot">&lt;-</span> <span class="fu">icd</span>(<span class="st">&quot;data&quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">ils</span>()</span></code></pre></div>
+<p>We can reset our working directories by providing the old path to
+<code>setwd()</code> and <code>icd()</code> respectively. Note that
+moving upwards in the file system is also possible by providing “../”
+for each level up you want to go: <code>icd(&quot;../&quot;)</code> changes the
+iRODS working directory to its parent collection.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">setwd</span>(old_local)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">getwd</span>()</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="fu">icd</span>(old_irods)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="fu">ipwd</span>()</span></code></pre></div>
+</div>
+<div id="create-directories" class="section level2">
+<h2>Create directories</h2>
+<p>Directories can be created in R with <code>dir.create(path)</code>;
+collections can be created in iRODS with <code>imkdir(path)</code>
+(“<strong>m</strong>a<strong>k</strong>e <strong>dir</strong>ectory”),
+providing a path relative to the working directory. For example, the
+code below creates an “analysis” directory under our working directory,
+first locally and then in iRODS.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">&quot;analysis&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">dir</span>()</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">imkdir</span>(<span class="st">&quot;analysis&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">ils</span>()</span></code></pre></div>
+</div>
+<div id="save-data" class="section level2">
+<h2>Save data</h2>
+<p>R and several R packages (such as <code>{readr}</code>) provide a
+number of functions to save data locally. For example,
+<code>writeLines(some_vector, path)</code> can be used to write a vector
+into a text file with one item per line;
+<code>write.csv(dataframe, path)</code> can be used to write a dataframe
+as a comma-separated file; <code>saveRDS(R_object, path)</code> can be
+used to write any R object into an RDS file. This path can be relative
+to the working directory or absolute paths.</p>
+<p>For example, let’s simulate some data and store it in our “data”
+directory with <code>write.csv()</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>fake_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="at">mean =</span> <span class="dv">1</span>))</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>fake_data<span class="sc">$</span>y <span class="ot">&lt;-</span> fake_data<span class="sc">$</span>x <span class="sc">*</span> <span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span> <span class="sc">-</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="at">sd =</span> <span class="fl">0.6</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">write.csv</span>(fake_data, <span class="fu">file.path</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;data.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">dir</span>(<span class="st">&quot;data&quot;</span>)</span></code></pre></div>
+<p>When saving data in iRODS, we don’t have these kinds of options.
+Instead, we can either transfer a file of any type from our local system
+to iRODS with <code>iput(local_path, irods_path)</code> or save an R
+object as an RDS file with
+<code>isaveRDS(some_object, irods_path)</code>. In the case of our
+simulated data, we use the first option:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">iput</span>(<span class="st">&quot;data/data.csv&quot;</span>, <span class="st">&quot;data/data_from_local.csv&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;data&quot;</span>)</span></code></pre></div>
+<p>Note that the file name need not stay the same in the local and iRODS
+systems. Now, let’s say that we have processed our data with some linear
+regression modelling.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> x, <span class="at">data =</span> fake_data)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>m</span></code></pre></div>
+<p>We could certainly store the output locally, but we could also decide
+to only store it in iRODS if we save it in RDS format. So let’s save it
+in the “analysis” collection.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">isaveRDS</span>(m, <span class="st">&quot;analysis/linear_model.rds&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;analysis&quot;</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">dir</span>(<span class="st">&quot;analysis&quot;</span>) <span class="co"># nothing was saved locally</span></span></code></pre></div>
+</div>
+<div id="read-data" class="section level2">
+<h2>Read data</h2>
+<p>Just like we have many different R functions to save files to
+different formats, there are specific functions to read files in
+different formats. And just like with <code>{rirods}</code> we either
+save in RDS format or transfer files from a local system to iRODS, we
+either read RDS files or transfer files back from iRODS to the local
+system. If we want to read “data_from_local.csv”, we first need to
+retrieve it with <code>iget(irods_path, local_path)</code> and then open
+it with an appropriate R function.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">iget</span>(<span class="st">&quot;data/data_from_local.csv&quot;</span>, <span class="st">&quot;data/data_from_irods.csv&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">dir</span>(<span class="st">&quot;data&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="fu">read.csv</span>(<span class="st">&quot;data/data_from_irods.csv&quot;</span>) <span class="co"># same as fake_data</span></span></code></pre></div>
+<p>For the RDS files, we could also use <code>iget()</code> if we wanted
+to store them locally, or simply <code>ireadRDS(irods_path)</code> to
+read the file directly.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># copy locally first</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">iget</span>(<span class="st">&quot;analysis/linear_model.rds&quot;</span>, <span class="st">&quot;analysis/linear_model_in_local.rds&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="fu">dir</span>(<span class="st">&quot;analysis&quot;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="fu">readRDS</span>(<span class="st">&quot;analysis/linear_model_in_local.rds&quot;</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co"># or read directly from iRODS</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="fu">ireadRDS</span>(<span class="st">&quot;analysis/linear_model.rds&quot;</span>)</span></code></pre></div>
+</div>
+<div id="remove-data" class="section level2">
+<h2>Remove data</h2>
+<p>Finally, local data can be removed with <code>unlink(path)</code> or
+<code>file.remove()</code>, whereas iRODS data can be
+<strong>r</strong>e<strong>m</strong>oved with <code>irm(path)</code>.
+Both <code>unlink()</code> and <code>irm()</code> take an optional
+argument <code>recursive</code> that should be <code>TRUE</code> if we
+want to remove a directory/collection and all its contents. In the case
+of <code>irm()</code>, the <code>force</code> argument also defines
+whether the item should be deleted permanently or, if
+<code>FALSE</code>, sent to the “trash” collection.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">unlink</span>(<span class="st">&quot;analysis&quot;</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">dir</span>()</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="fu">irm</span>(<span class="st">&quot;data&quot;</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">force =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="fu">ils</span>()</span></code></pre></div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Which is <a href="https://github.com/jennybc/here_here">not recommended</a> in any
+case.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,6 +1,6 @@
 Package: rirods
 Title: R Client for 'iRODS'
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
     person("Martin", "Schobben", , "schobbenmartin@gmail.com", 
            role = c("aut", "cre", "cph"),
@@ -19,20 +19,23 @@ Description: The open sourced data management software 'Integrated Rule-Oriented
     with R. Storage of annotated files and R objects in 'iRODS' ensures 
     findability, accessibility, interoperability, and reusability of data.
 License: MIT + file LICENSE
-URL: https://github.com/irods/irods_client_library_rirods
+URL: https://github.com/irods/irods_client_library_rirods,
+        https://rirods.irods4r.org
 BugReports: https://github.com/irods/irods_client_library_rirods/issues
 Depends: R (>= 4.1)
 Imports: askpass, base64enc, httr2 (>= 0.2.2), methods, rappdirs,
         tools, utils, withr
-Suggests: httptest2, jsonlite, knitr, readr, rmarkdown, spelling,
-        testthat (>= 3.0.0), xml2
+Suggests: httptest2, jsonlite, kableExtra, knitr, purrr, readr,
+        rmarkdown, spelling, testthat (>= 3.0.0), xml2
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 RoxygenNote: 7.2.3
+SystemRequirements: iRODS C++ REST API 0.9.3
+        (https://github.com/irods/irods_client_rest_cpp)
 NeedsCompilation: no
-Packaged: 2023-06-29 07:38:17 UTC; amandus
+Packaged: 2023-11-02 16:44:54 UTC; amandus
 Author: Martin Schobben [aut, cre, cph]
     (<https://orcid.org/0000-0001-8560-0037>),
   Mariana Montes [aut],
@@ -42,4 +45,4 @@ Author: Martin Schobben [aut, cre, cph]
   Alan King [ctb]
 Maintainer: Martin Schobben <schobbenmartin@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-06-30 11:30:02 UTC
+Date/Publication: 2023-11-02 18:40:02 UTC

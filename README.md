@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# rirods
+# rirods <a href="https://dplyr.tidyverse.org"><img src="man/figures/logo.png" align="right" height="138" /></a>
 
 <!-- badges: start -->
 
@@ -42,11 +42,11 @@ use_irods_demo("alice", "passWORD")
 ```
 
 This will result in the demonstration REST API running at
-http://localhost/irods-rest/0.9.3 (or later version).
+`http://localhost/irods-rest/0.9.3` (or later version).
 
 These Docker containers are designed to easily stand up a
 **DEMONSTRATION** of the iRODS server. It is intended for education and
-exploration.
+exploration. (See also `vignette("demo")`.)
 
 **DO NOT USE IN PRODUCTION**
 
@@ -61,7 +61,7 @@ credentials:
 create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
 ```
 
-### authentication
+### Authentication
 
 In this example Alice is a user of iRODS and she can authenticate
 herself with `iauth()`. This prompts a dialog where you can enter your
@@ -73,7 +73,7 @@ scripts.
 iauth() # or iauth("alice", "passWORD")
 ```
 
-### save R objects
+### Save R objects
 
 Suppose Alice would like to upload an R object from her current R
 session to an iRODS collection. For this, use the `isaveRDS()` command:
@@ -90,7 +90,7 @@ ipwd()
 isaveRDS(foo, "foo.rds")
 ```
 
-### metadata
+### Metadata
 
 To truly appreciate the strength of iRODS, we can add some metadata that
 describes the data object “foo”:
@@ -122,7 +122,9 @@ ils(metadata = TRUE)
 #>  /tempZone/home/alice/foo.rds data_object
 ```
 
-### read R objects
+For more on using metadata, check out `vignette("metadata")`.
+
+### Read R objects
 
 If Alice wanted to copy the foo R object from an iRODS collection to her
 current R session, she would use `ireadRDS()`:
@@ -136,7 +138,7 @@ ireadRDS("foo.rds")
 #> 3 9 z
 ```
 
-### csv
+### Other file formats
 
 Possibly Alice does not want a native R object to be stored on iRODS but
 a file type that can be accessed by other programs. For this, use the
@@ -185,7 +187,7 @@ read_csv("foo.csv")
 #> 3     9 z
 ```
 
-### query
+### Query
 
 By adding metadata you and others can more easily discover data in
 future projects. Objects can be searched with General Queries and
@@ -194,20 +196,22 @@ future projects. Objects can be searched with General Queries and
 ``` r
 # look for objects in the home collection with a wildcard `%`
 iquery("SELECT COLL_NAME, DATA_NAME WHERE COLL_NAME LIKE '/tempZone/home/%'")
-#>      [,1]                   [,2]     
-#> [1,] "/tempZone/home/alice" "foo.csv"
-#> [2,] "/tempZone/home/alice" "foo.rds"
+#>              COLL_NAME DATA_NAME
+#> 1 /tempZone/home/alice   foo.csv
+#> 2 /tempZone/home/alice   foo.rds
 ```
 
 ``` r
 # or for data objects with a name that starts with "foo"
 iquery("SELECT COLL_NAME, DATA_NAME WHERE DATA_NAME LIKE 'foo%'")
-#>      [,1]                   [,2]     
-#> [1,] "/tempZone/home/alice" "foo.csv"
-#> [2,] "/tempZone/home/alice" "foo.rds"
+#>              COLL_NAME DATA_NAME
+#> 1 /tempZone/home/alice   foo.csv
+#> 2 /tempZone/home/alice   foo.rds
 ```
 
-### cleanup
+For more on querying, check out `vignette("metadata")`.
+
+### Cleanup
 
 Finally, we can clean up Alice’s home collection:
 

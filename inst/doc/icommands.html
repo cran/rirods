@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Mariana Montes" />
+
+<meta name="date" content="2023-11-02" />
+
+<title>rirods vs iCommands</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">rirods vs iCommands</h1>
+<h4 class="author">Mariana Montes</h4>
+<h4 class="date">2023-11-02</h4>
+
+
+
+<p>This article is meant for iRODS users familiar with iCommands, the
+command-line interface to iRODS. While <code>{rirods}</code> functions
+are based on iCommands, not all iCommands are covered and some
+functionality may differ. The article also compares the bash calls to
+the R calls in case the reader is not so familiar with R syntax.</p>
+<p>The table below lists the main functions available in
+<code>{rirods}</code> and their counterparts in iCommands.</p>
+<table>
+<thead>
+<tr class="header">
+<th><code>{rirods}</code></th>
+<th><code>iCommands</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>icd()</code></td>
+<td><code>icd</code></td>
+</tr>
+<tr class="even">
+<td><code>ipwd()</code></td>
+<td><code>ipwd</code></td>
+</tr>
+<tr class="odd">
+<td><code>ils()</code></td>
+<td><code>ils</code></td>
+</tr>
+<tr class="even">
+<td><code>iget()</code>, <code>ireadRDS()</code></td>
+<td><code>iget</code></td>
+</tr>
+<tr class="odd">
+<td><code>iput()</code>, <code>isaveRDS()</code></td>
+<td><code>iput</code></td>
+</tr>
+<tr class="even">
+<td><code>imeta()</code></td>
+<td><code>imeta</code></td>
+</tr>
+<tr class="odd">
+<td><code>iquery()</code></td>
+<td><code>iquest</code></td>
+</tr>
+<tr class="even">
+<td><code>imkdir()</code></td>
+<td><code>imkdir</code></td>
+</tr>
+<tr class="odd">
+<td><code>irm()</code></td>
+<td><code>irm</code></td>
+</tr>
+</tbody>
+</table>
+<p>A general note is that in iCommands the <code>-h</code> argument
+provides the documentation for a certain command
+(e.g. <code>icd -h</code>), whereas in R this is achieved by preceding
+the name of the function with <code>?</code> (e.g. <code>?icd</code>).
+Moreover, the <code>verbose</code> boolean argument in most of
+<code>{rirods}</code> commands is used to print information about the
+HTTP request and response (and is by default <code>FALSE</code>), which
+is not a behaviour relevant to iCommands.</p>
+<div id="working-directory-and-collections" class="section level2">
+<h2>Working directory and collections</h2>
+<p>The iCommand <code>ipwd</code> and its <code>{rirods}</code>
+counterpart <code>ipwd()</code> work exactly the same, providing the
+path to the current working directory. The case of <code>icd()</code> is
+different; unlike <code>icd</code>, which returns the “/zone/home”
+directory if no argument is provided, <code>icd()</code> needs an
+argument with the path for a new working directory.
+<code>icd(&quot;/tempZone/home&quot;)</code> will take us to
+<code>&quot;/tempZone/home&quot;</code> like <code>icd</code> might, but
+<code>icd()</code> with no arguments will throw an error.</p>
+<p>When it comes to listing the contents of a collection, both
+<code>ils</code> and <code>ils()</code> can be given a path, and if they
+are not, they list the contents of the working directory. Permissions
+can be shown by <code>ils</code> with the <code>-A</code> argument and
+by <code>ils()</code> by providing <code>permissions=TRUE</code>,
+although the latter does not return information about inheritance<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. The time
+that the item was last modified and the size of data objects is shown by
+<code>ils -l</code> and by <code>ils(stats=TRUE)</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">ils</span>() <span class="co"># ils</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>) <span class="co"># ils some_collection</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">stat=</span><span class="cn">TRUE</span>) <span class="co"># ils -l some_collection</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">permissions=</span><span class="cn">TRUE</span>) <span class="co"># ils -A some_collection</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">permissions=</span><span class="cn">TRUE</span>, <span class="at">stat=</span><span class="cn">TRUE</span>) <span class="co"># ils -Al</span></span></code></pre></div>
+<p>A crucial difference between <code>ils</code> and <code>ils()</code>
+is that <code>ils(metadata=TRUE)</code> is used to print the metadata
+information of each element listed, whereas iCommands only provides
+metadata information of one element at a time by calling
+<code>imeta ls</code> on it. At the moment, <code>{rirods}</code> does
+not offer any fast way of restricting the metadata to a specific item,
+although the custom function <code>filter_ils()</code> shown below could
+be used to achieve this result.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>filter_ils <span class="ot">&lt;-</span> <span class="cf">function</span>(pattern, <span class="at">ils_output =</span> <span class="fu">ils</span>()) {</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">inherits</span>(ils_output, <span class="st">&quot;irods_df&quot;</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  ils_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ils_output)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(pattern) <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    filtered <span class="ot">&lt;-</span> ils_df[<span class="fu">grepl</span>(pattern, ils_df<span class="sc">$</span>logical_path),]</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    filtered <span class="ot">&lt;-</span> ils_df[<span class="fu">basename</span>(ils_df<span class="sc">$</span>logical_path) <span class="sc">%in%</span> pattern,]</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  }</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  rirods<span class="sc">:::</span><span class="fu">new_irods_df</span>(filtered)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>my_files <span class="ot">&lt;-</span> <span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">metadata=</span><span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>my_files</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">filter_ils</span>(<span class="st">&quot;random&quot;</span>, my_files) <span class="co"># imeta ls -d some_collection/random_numbers.rds</span></span></code></pre></div>
+</div>
+<div id="creating-and-deleting-collections-or-data-objects" class="section level2">
+<h2>Creating and deleting collections or data objects</h2>
+<p>With iCommands we can create new collections and data objects with
+<code>imkdir</code> and <code>itouch</code> respectively. The former is
+matched in <code>{rirods}</code> by <code>imkdir()</code>, but the
+latter is not covered by the R package yet.</p>
+<p>Both in iCommands and in <code>{rirods}</code>, <code>imkdir()</code>
+requires a path and has an argument to request creating the parent
+collections:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">imkdir</span>(<span class="st">&quot;new_collection&quot;</span>) <span class="co"># imkdir new_collection</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">ils</span>()</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># imkdir -p another_collection/subcollection</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="fu">imkdir</span>(<span class="st">&quot;another_collection/subcollection&quot;</span>, <span class="at">create_parent_collections =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">ils</span>()</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;another_collection&quot;</span>)</span></code></pre></div>
+<p>Removing data objects and collections can be achieved by
+<code>irm</code> in iCommands and <code>irm()</code> in
+<code>{rirods}</code>, and both functions have a <code>force</code> and
+<code>recursive</code> arguments:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">irm</span>(<span class="st">&quot;200numbers.rds&quot;</span>, <span class="at">force =</span> <span class="cn">FALSE</span>) <span class="co"># irm 200numbers.rds</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;/tempZone/trash/home/rods&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">irm</span>(<span class="st">&quot;another_collection&quot;</span>, <span class="at">force =</span> <span class="cn">TRUE</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>) <span class="co"># irm -rf another_collection</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">iquery</span>(<span class="st">&quot;SELECT COLL_NAME WHERE COLL_NAME LIKE &#39;%_collection&#39;&quot;</span>)</span></code></pre></div>
+</div>
+<div id="getting-and-putting-data" class="section level2">
+<h2>Getting and putting data</h2>
+<p>In order to transfer data between a local system and iRODS, the main
+iCommands are <code>iput</code> and <code>iget</code>, which have
+<code>iput()</code> and <code>iget()</code> as <code>{rirods}</code>
+counterparts. The <code>{rirods}</code> functions are much more
+restricted in that they don’t really offer the variety of arguments that
+the iCommands do, but only options related to the HTTP requests.
+Moreover, they require the user to provide both the local and logical
+paths explicitly, whereas the iCommands reuse the source path by
+default. In other words, while <code>iput myfile.txt</code> will take a
+local file “myfile.txt” and store it in the iRODS working directory as
+“myfile.txt”, <code>iput(&quot;myfile.txt&quot;)</code> will throw an error;
+<code>iput(&quot;myfile.txt&quot;, &quot;myfile.txt&quot;)</code> is the correct syntax to
+achieve the desired effect:</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><code>{rirods}</code></th>
+<th><code>iCommands</code></th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>iget(&quot;myfile.txt&quot;, &quot;myfile.txt&quot;)</code></td>
+<td><code>iget myfile.txt</code></td>
+<td>“myfile.txt” is copied from iRODS to local as “myfile.txt”</td>
+</tr>
+<tr class="even">
+<td><code>iget(&quot;myfile.txt&quot;, &quot;another_path/filename.txt&quot;)</code></td>
+<td><code>iget myfile.txt another_path/filename.txt</code></td>
+<td>“myfile.txt” is copied from iRODS to local as “filename.txt” in
+“another_path”</td>
+</tr>
+<tr class="odd">
+<td><code>iput(&quot;data.csv&quot;, &quot;data.csv&quot;)</code></td>
+<td><code>iput data.csv</code></td>
+<td>“data.csv” is copied from local to iRODS as “data.csv”</td>
+</tr>
+<tr class="even">
+<td><code>iput(&quot;data.csv&quot;, &quot;data2.csv&quot;)</code></td>
+<td><code>iput data.csv data2.csv</code></td>
+<td>“data.csv” is copied from local to iRODS as “data2.csv”</td>
+</tr>
+</tbody>
+</table>
+<p>Next to these functions, <code>{rirods}</code> provides two functions
+to store R objects directly into iRODS or read RDS files directly from
+iRODS: <code>isaveRDS()</code> and <code>ireadRDS()</code>. There is no
+counterpart in iCommands. To achieve the same effect as
+<code>isaveRDS()</code>, a user would first have to save their object
+with <code>saveRDS()</code>, then send it to iRODS with
+<code>iput</code> and finally remove it with <code>irm -f</code>; in the
+same vein, the effect of <code>ireadRDS()</code> would be achieved by
+retrieving the file with <code>iget</code>, reading it with
+<code>readRDS()</code> and then removing it from the local space. Read
+more about this in <code>vignette(&quot;local-irods&quot;)</code>.</p>
+</div>
+<div id="metadata-and-querying" class="section level2">
+<h2>Metadata and querying</h2>
+<p>The <code>{rirods}</code> <code>imeta()</code> function covers two of
+the main functionalities of the <code>imeta</code> iCommand: adding and
+removing metadata from a data object or collection. This function has
+three main arguments: the logical path of the data object or collection
+on which to add the metadata, the entity type (e.g. “data_object”, the
+default, or “collection”) and a list of operations, in which it is
+specified whether a certain AVU should be added or removed.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">icd</span>(<span class="st">&quot;some_collection&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">metadata=</span><span class="cn">TRUE</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># imeta add -C subcollection foo bar baz</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">imeta</span>(<span class="st">&quot;subcollection&quot;</span>, <span class="st">&quot;collection&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>      <span class="at">operations =</span> <span class="fu">list</span>(</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>        <span class="fu">list</span>(<span class="at">operation=</span><span class="st">&quot;add&quot;</span>, <span class="at">attribute=</span><span class="st">&quot;foo&quot;</span>, <span class="at">value=</span><span class="st">&quot;bar&quot;</span>, <span class="at">units=</span><span class="st">&quot;baz&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>        )</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>      )</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co"># imeta rm -d random_numbers.rds distribution normal</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="fu">imeta</span>(<span class="st">&quot;random_numbers.rds&quot;</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>      <span class="at">operations =</span> <span class="fu">list</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>        <span class="fu">list</span>(<span class="at">operation=</span><span class="st">&quot;remove&quot;</span>, <span class="at">attribute=</span><span class="st">&quot;distribution&quot;</span>, <span class="at">value=</span><span class="st">&quot;normal&quot;</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>      ))</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">metadata=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>In order to “modify” an AVU with <code>{rirods}</code>, we would have
+to remove it and add its replacement. This also illustrates how we can
+add/remove several AVUs in one <code>imeta()</code> call, which would
+not be possible with <code>imeta</code><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># imeta mod -d random_numbers.rds length 100 items u:elements</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">imeta</span>(<span class="st">&quot;random_numbers.rds&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>      <span class="at">operations =</span> <span class="fu">list</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>        <span class="fu">list</span>(<span class="at">operation=</span><span class="st">&quot;remove&quot;</span>, <span class="at">attribute=</span><span class="st">&quot;length&quot;</span>, <span class="at">value=</span><span class="st">&quot;100&quot;</span>, <span class="at">units=</span><span class="st">&quot;items&quot;</span>),</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>        <span class="fu">list</span>(<span class="at">operation=</span><span class="st">&quot;add&quot;</span>, <span class="at">attribute=</span><span class="st">&quot;length&quot;</span>, <span class="at">value=</span><span class="st">&quot;100&quot;</span>, <span class="at">units=</span><span class="st">&quot;elements&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>      ))</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">metadata=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>As mentioned before, whereas the iCommand <code>imeta ls</code> is
+used to list the metadata of an item, <code>ils(metadata=TRUE)</code> is
+used in <code>{rirods}</code> instead.</p>
+<p>Finally, the <code>{rirods}</code> equivalent of iCommand
+<code>iquest</code> is <code>iquery()</code>, with the same GenQuery
+expression as main argument and a few compatible arguments. Given a
+<code>query</code> variable such as “SELECT DATA_NAME, DATA_CHECKSUM
+WHERE COLL_NAME LIKE ‘/tempZone/home/rods%’”:</p>
+<table>
+<thead>
+<tr class="header">
+<th><code>{rirods}</code></th>
+<th><code>iCommands</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>iquery(query)</code></td>
+<td><code>iquest &quot;$query&quot;</code></td>
+</tr>
+<tr class="even">
+<td><code>iquery(query, case_sensitive = FALSE)</code></td>
+<td><code>iquest uppercase &quot;$query&quot;</code></td>
+</tr>
+<tr class="odd">
+<td><code>iquery(query, distinct = FALSE)</code></td>
+<td><code>iquest no-distinct &quot;$query&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<p>To learn more about <code>imeta()</code> and <code>iquery()</code>,
+see <code>vignette(&quot;metadata&quot;)</code>.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>At the moment there is no functionality in
+<code>{rirods}</code> to set permissions.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>This is similar to the behavior of atomic operations in
+the Python client.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
