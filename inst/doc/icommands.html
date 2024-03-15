@@ -12,7 +12,7 @@
 
 <meta name="author" content="Mariana Montes" />
 
-<meta name="date" content="2023-11-02" />
+<meta name="date" content="2024-03-15" />
 
 <title>rirods vs iCommands</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">rirods vs iCommands</h1>
 <h4 class="author">Mariana Montes</h4>
-<h4 class="date">2023-11-02</h4>
+<h4 class="date">2024-03-15</h4>
 
 
 
@@ -426,9 +426,9 @@ that the item was last modified and the size of data objects is shown by
 <code>ils -l</code> and by <code>ils(stats=TRUE)</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">ils</span>() <span class="co"># ils</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>) <span class="co"># ils some_collection</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">stat=</span><span class="cn">TRUE</span>) <span class="co"># ils -l some_collection</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">permissions=</span><span class="cn">TRUE</span>) <span class="co"># ils -A some_collection</span></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">permissions=</span><span class="cn">TRUE</span>, <span class="at">stat=</span><span class="cn">TRUE</span>) <span class="co"># ils -Al</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">stat =</span> <span class="cn">TRUE</span>) <span class="co"># ils -l some_collection</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">permissions =</span> <span class="cn">TRUE</span>) <span class="co"># ils -A some_collection</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">permissions=</span><span class="cn">TRUE</span>, <span class="at">stat =</span> <span class="cn">TRUE</span>) <span class="co"># ils -Al</span></span></code></pre></div>
 <p>A crucial difference between <code>ils</code> and <code>ils()</code>
 is that <code>ils(metadata=TRUE)</code> is used to print the metadata
 information of each element listed, whereas iCommands only provides
@@ -441,13 +441,13 @@ be used to achieve this result.</p>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">inherits</span>(ils_output, <span class="st">&quot;irods_df&quot;</span>))</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  ils_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(ils_output)</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(pattern) <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    filtered <span class="ot">&lt;-</span> ils_df[<span class="fu">grepl</span>(pattern, ils_df<span class="sc">$</span>logical_path),]</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    filtered <span class="ot">&lt;-</span> ils_df[<span class="fu">grepl</span>(pattern, ils_df<span class="sc">$</span>logical_path), ]</span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    filtered <span class="ot">&lt;-</span> ils_df[<span class="fu">basename</span>(ils_df<span class="sc">$</span>logical_path) <span class="sc">%in%</span> pattern,]</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    filtered <span class="ot">&lt;-</span> ils_df[<span class="fu">basename</span>(ils_df<span class="sc">$</span>logical_path) <span class="sc">%in%</span> pattern, ]</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  }</span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  rirods<span class="sc">:::</span><span class="fu">new_irods_df</span>(filtered)</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>my_files <span class="ot">&lt;-</span> <span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">metadata=</span><span class="cn">TRUE</span>)</span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>my_files <span class="ot">&lt;-</span> <span class="fu">ils</span>(<span class="st">&quot;some_collection&quot;</span>, <span class="at">metadata =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>my_files</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">filter_ils</span>(<span class="st">&quot;random&quot;</span>, my_files) <span class="co"># imeta ls -d some_collection/random_numbers.rds</span></span></code></pre></div>
 </div>
@@ -555,7 +555,7 @@ specified whether a certain AVU should be added or removed.</p>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">metadata=</span><span class="cn">TRUE</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># imeta add -C subcollection foo bar baz</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">imeta</span>(<span class="st">&quot;subcollection&quot;</span>, <span class="st">&quot;collection&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">imeta</span>(<span class="st">&quot;subcollection&quot;</span>,</span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>      <span class="at">operations =</span> <span class="fu">list</span>(</span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>        <span class="fu">list</span>(<span class="at">operation=</span><span class="st">&quot;add&quot;</span>, <span class="at">attribute=</span><span class="st">&quot;foo&quot;</span>, <span class="at">value=</span><span class="st">&quot;bar&quot;</span>, <span class="at">units=</span><span class="st">&quot;baz&quot;</span>)</span>
 <span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>        )</span>

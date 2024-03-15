@@ -12,7 +12,7 @@
 
 <meta name="author" content="Mariana Montes" />
 
-<meta name="date" content="2023-11-02" />
+<meta name="date" content="2024-03-15" />
 
 <title>Use iRODS metadata</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Use iRODS metadata</h1>
 <h4 class="author">Mariana Montes</h4>
-<h4 class="date">2023-11-02</h4>
+<h4 class="date">2024-03-15</h4>
 
 
 
@@ -414,9 +414,9 @@ argument of <code>imeta()</code> can also be a dataframe. Say, for
 example, that we have a standard set of metadata fields that we would
 like to add to the linear model:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>lm_meta <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>    <span class="at">attribute =</span> <span class="fu">c</span>(<span class="st">&quot;size&quot;</span>, <span class="st">&quot;size&quot;</span>, <span class="st">&quot;data_file&quot;</span>, <span class="st">&quot;model_type&quot;</span>),</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>    <span class="at">value =</span> <span class="fu">c</span>(<span class="fu">as.character</span>(<span class="fu">nrow</span>(fake_data)), <span class="dv">1</span>, data_path, <span class="st">&quot;linear regression&quot;</span>),</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>    <span class="at">units=</span> <span class="fu">c</span>(<span class="st">&quot;observations&quot;</span>, <span class="st">&quot;predictors&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">attribute =</span> <span class="fu">c</span>(<span class="st">&quot;size&quot;</span>, <span class="st">&quot;size&quot;</span>, <span class="st">&quot;data_file&quot;</span>, <span class="st">&quot;model_type&quot;</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="fu">as.character</span>(<span class="fu">nrow</span>(fake_data)), <span class="dv">1</span>, data_path, <span class="st">&quot;linear regression&quot;</span>),</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">units =</span> <span class="fu">c</span>(<span class="st">&quot;observations&quot;</span>, <span class="st">&quot;predictors&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>)</span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>)</span>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>lm_meta</span></code></pre></div>
 <p>We can then just add a column with the operation name and add it to
@@ -435,12 +435,20 @@ function such as <code>purrr:::pmap()</code>:</p>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">type =</span> <span class="fu">c</span>(<span class="st">&quot;dataframe&quot;</span>, <span class="st">&quot;lm&quot;</span>),</span>
 <span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">responsible =</span> <span class="fu">c</span>(<span class="st">&quot;abby&quot;</span>, <span class="st">&quot;bob&quot;</span>)</span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>)</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="fu">pmap</span>(file_md, <span class="cf">function</span>(path, type, responsible) {</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="fu">pwalk</span>(file_md, <span class="cf">function</span>(path, type, responsible) {</span>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="fu">imeta</span>(path, <span class="at">operations =</span> <span class="fu">list</span>(</span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">operation =</span> <span class="st">&quot;add&quot;</span>, <span class="at">attribute =</span> <span class="st">&quot;type&quot;</span>, <span class="at">value =</span> type),</span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">operation =</span> <span class="st">&quot;add&quot;</span>, <span class="at">attribute =</span> <span class="st">&quot;responsible&quot;</span>, <span class="at">value =</span> responsible)</span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  ))</span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>})</span></code></pre></div>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>      <span class="at">operation =</span> <span class="st">&quot;add&quot;</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>      <span class="at">attribute =</span> <span class="st">&quot;type&quot;</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>      <span class="at">value =</span> type</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>    ),</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>      <span class="at">operation =</span> <span class="st">&quot;add&quot;</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>      <span class="at">attribute =</span> <span class="st">&quot;responsible&quot;</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>      <span class="at">value =</span> responsible</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>    )</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>  ))</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>})</span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">metadata=</span><span class="cn">TRUE</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">ils</span>(<span class="st">&quot;analysis&quot;</span>, <span class="at">metadata=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
@@ -451,11 +459,10 @@ need to specify the entity type. The reason we did not specify it for
 data objects is that it’s the default value.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">imeta</span>(</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="st">&quot;analysis&quot;</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="st">&quot;collection&quot;</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">operations =</span> <span class="fu">list</span>(</span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">operation =</span> <span class="st">&quot;add&quot;</span>, <span class="at">attribute =</span> <span class="st">&quot;dataset&quot;</span>, <span class="at">value =</span> data_path)</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  ))</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">metadata=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">operations =</span> <span class="fu">list</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>    <span class="fu">list</span>(<span class="at">operation =</span> <span class="st">&quot;add&quot;</span>, <span class="at">attribute =</span> <span class="st">&quot;dataset&quot;</span>, <span class="at">value =</span> data_path)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  ))</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="fu">ils</span>(<span class="at">metadata=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="querying" class="section level1">

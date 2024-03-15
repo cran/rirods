@@ -15,15 +15,15 @@
 #'
 #' @examplesIf is_irods_demo_running()
 #' is_irods_demo_running()
-#'
-#' # demonstration server (requires Bash, Docker and Docker-compose)
-#' # use_irods_demo()
-#'
+#' \dontshow{
+#' .old_config_dir <- Sys.getenv("R_USER_CONFIG_DIR")
+#' Sys.setenv("R_USER_CONFIG_DIR" = tempdir())
+#' }
 #' # connect project to server
-#' create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
+#' \Sexpr[stage=build, results=rd]{paste0("create_irods(\"", rirods:::.irods_host, "\")")}
 #'
 #' # authenticate
-#' iauth("rods", "rods")
+#' iauth("rods", "rods", "rodsadmin")
 #'
 #' # default dir
 #' icd(".")
@@ -43,8 +43,13 @@
 #'
 #' # back home
 #' icd("/tempZone/home")
-#'
-icd  <- function(dir) {
+#' \dontshow{
+#' Sys.setenv("R_USER_CONFIG_DIR" = .old_config_dir)
+#' }
+icd <- function(dir) {
+
+  # check connection
+  if (!is_connected_irods()) stop("Not connected to iRODS.", call. = FALSE)
 
   # remove trailing slash
   dir <- gsub("/+$", "", dir)
@@ -131,10 +136,11 @@ ipwd <- function() .rirods$current_dir
 #'    Defaults to `FALSE`.
 #' @param metadata Whether metadata information should be included. Defaults to
 #'    `FALSE`.
-#' @param offset Number of records to skip for pagination. Defaults to 0.
-#' @param limit Number of records to show per page. Defaults to 100.
-#' @param message Whether a message should be printed when the collection is
-#'    empty. Defaults to `TRUE`.
+#' @param offset Number of records to skip for pagination. Deprecated.
+#' @param recurse Recursively list. Defaults to `FALSE`.
+#' @param ticket A valid iRODS ticket string. Defaults to `NULL`.
+#' @param message Show message when empty collection. Default to `FALSE`.
+#' @param limit Number of records to show per page.
 #' @param verbose Whether information should be printed about the HTTP request
 #'    and response. Defaults to `FALSE`.
 #'
@@ -149,12 +155,12 @@ ipwd <- function() .rirods$current_dir
 #'
 #' @examplesIf is_irods_demo_running()
 #' is_irods_demo_running()
-#'
-#' # demonstration server (requires Bash, Docker and Docker-compose)
-#' # use_irods_demo()
-#'
+#' \dontshow{
+#' .old_config_dir <- Sys.getenv("R_USER_CONFIG_DIR")
+#' Sys.setenv("R_USER_CONFIG_DIR" = tempdir())
+#' }
 #' # connect project to server
-#' create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
+#' \Sexpr[stage=build, results=rd]{paste0("create_irods(\"", rirods:::.irods_host, "\")")}
 #'
 #' # authenticate
 #' iauth("rods", "rods")
@@ -173,71 +179,120 @@ ipwd <- function() .rirods$current_dir
 #'
 #' # delete `some_collection`
 #' irm("some_collection", force = TRUE, recursive = TRUE)
-#'
+#' \dontshow{
+#' Sys.setenv("R_USER_CONFIG_DIR" = .old_config_dir)
+#' }
 ils <- function(
-    logical_path = ".",
-    stat = FALSE,
-    permissions = FALSE,
-    metadata = FALSE,
-    offset = 0,
-    limit = 100,
-    message = TRUE,
-    verbose = FALSE
+  logical_path = ".",
+  stat = FALSE,
+  permissions = FALSE,
+  metadata = FALSE,
+  offset = numeric(1),
+  limit = find_irods_file("max_number_of_rows_per_catalog_query"),
+  recurse = FALSE,
+  ticket = NULL,
+  message = TRUE,
+  verbose = FALSE
 ) {
-
   # logical path
   if (logical_path == ".") {
     lpath <- .rirods$current_dir
   } else if (startsWith(logical_path, "/")) {
     lpath <- logical_path
   } else {
-    lpath <- file.path(.rirods$current_dir, logical_path)
+    lpath <- paste0(.rirods$current_dir, "/", logical_path)
   }
+
+  # deprecate arguments
+  if (!missing("offset"))
+    warning("Argument `offset` is deprecated")
 
   # flags to curl call
   args <- list(
-    `logical-path` = lpath,
-    stat = as.integer(stat),
-    permissions = as.integer(permissions),
-    metadata = as.integer(metadata),
-    offset = offset,
-    limit = limit
+    op = "list",
+    lpath = lpath,
+    recurse = as.integer(recurse),
+    ticket = ticket
   )
 
-  # http call
-  out <- irods_rest_call("list", "GET", args, verbose)
+  out <- irods_http_call("collections", "GET", args, verbose) |>
+    httr2::req_perform()
 
-  # parse
-  out <- httr2::resp_body_json(
-    out,
-    check_type = FALSE,
-    simplifyVector = TRUE
-  )$`_embedded`
+  lpaths <- httr2::resp_body_json(out, check_type = FALSE, simplifyVector = TRUE)$entries
+
+  irods_zone_overview <- data.frame(logical_path = lpaths)
+
   if (isTRUE(stat)) {
-    converted_last_write_time <- as.POSIXct(
-      as.numeric(out$status_information$last_write_time),
-      origin = "1970-01-01")
-    out$status_information$last_write_time <- converted_last_write_time
-    if ("size" %in% colnames(out$status_information)) {
-      out$status_information$size <- as.numeric(out$status_information$size)
+    ils_stat_dataframe <- make_ils_stat(irods_zone_overview$logical_path)
+    irods_zone_overview <- cbind(irods_zone_overview, ils_stat_dataframe)
+  }
+
+  if (isTRUE(metadata)) {
+    ils_meta_dataframe <- make_ils_metadata(lpath)
+    if (!is.null(ils_meta_dataframe)) {
+      irods_zone_overview <-
+        merge(irods_zone_overview, ils_meta_dataframe, all.x = TRUE)
     }
   }
-  out <- new_irods_df(out)
 
-  # metadata reordering
-  if (isTRUE(metadata)) {
-    try(out <- metadata_reorder(out), silent = TRUE)
-  }
-
-  # output
-  out
+  limit_maximum_number_of_rows_catalog(irods_zone_overview, limit) |>
+    new_irods_df()
 }
 
-# reorder metadata if it exists
-metadata_reorder <- function(x) {
-  x$metadata <- Map(
-    function(x) if (length(x) > 0) x[ ,c("attribute", "value", "units")] else x,
-    x$metadata
+make_ils_stat <- function(lpaths) {
+  stat_list <- lapply(lpaths, get_stat)
+  Reduce(rbind_unequal_shaped_dataframes, stat_list)
+}
+
+make_ils_metadata <- function(lpath) {
+  metadata_collections <-
+    iquery(collection_metadata(lpath, recurse = TRUE))
+  metadata_data_objects <- iquery(data_object_metadata(lpath))
+  if (length(metadata_collections) == 0 && length(metadata_data_objects) == 0) {
+    message("No metadata")
+    return(NULL)
+  } else if (length(metadata_data_objects) == 0) {
+    metadata <- metadata_collections
+  } else if (length(metadata_collections) == 0) {
+    metadata <- metadata_data_objects
+  } else {
+    metadata <-
+      rbind_unequal_shaped_dataframes(metadata_collections, metadata_data_objects)
+  }
+  data.frame(
+    logical_path = paste0(metadata[["COLL_NAME"]],  ifelse(
+      is.na(metadata[["DATA_NAME"]]), "", paste0("/", metadata[["DATA_NAME"]])
+    )),
+    attribute = ifelse(
+      all(is.na(metadata[["META_COLL_ATTR_NAME"]])) ||
+        all(is.null(metadata[["META_COLL_ATTR_NAME"]])),
+     stats::na.omit(metadata["META_DATA_ATTR_NAME"]),
+     stats::na.omit(metadata["META_COLL_ATTR_NAME"]))[[1]],
+    value = ifelse(
+      all(is.na(metadata[["META_COLL_ATTR_VALUE"]])) ||
+        all(is.null(metadata[["META_COLL_ATTR_VALUE"]])),
+     stats::na.omit(metadata["META_DATA_ATTR_VALUE"]),
+     stats::na.omit(metadata["META_COLL_ATTR_VALUE"]))[[1]],
+    units = ifelse(
+      all(is.na(metadata[["META_COLL_ATTR_UNITS"]])) ||
+        all(is.null(metadata[["META_COLL_ATTR_UNITS"]])),
+     stats::na.omit(metadata["META_DATA_ATTR_UNITS"]),
+     stats::na.omit(metadata["META_COLL_ATTR_UNITS"]))[[1]]
   )
-  x
+}
+
+rbind_unequal_shaped_dataframes <- function(df1, df2) {
+  df1[setdiff(names(df2), names(df1))] <- NA_character_
+  df2[setdiff(names(df1), names(df2))] <- NA_character_
+  rbind(df1, df2)
+}
+
+get_stat <- function(lpath) {
+  stat_collection <- try(get_stat_collections(lpath), silent = TRUE)
+  stat_data_object <- try(get_stat_data_objects(lpath), silent = TRUE)
+  if (stat_collection$status_code == -170000L) {
+    return(stat_data_object)
+  } else if (stat_data_object$status_code == -171000L) {
+    return(stat_collection)
+  }
 }

@@ -13,11 +13,21 @@ knitr::opts_chunk$set(
 #  library(rirods)
 #  use_irods_demo()
 
+## ----echo=FALSE, comment=""---------------------------------------------------
+#  # set user config directory to temporary location
+#  withr::local_envvar(
+#    R_USER_CONFIG_DIR = tempdir()
+#  )
+#  substitute(create_irods(x), list(x = rirods:::.irods_host))
+
+## ----echo=FALSE---------------------------------------------------------------
+#  eval(substitute(create_irods(x), list(x = rirods:::.irods_host)))
+
 ## -----------------------------------------------------------------------------
-#  create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home", overwrite = TRUE)
 #  iauth("rods", "rods")
 #  ils()
 
 ## ----include=FALSE------------------------------------------------------------
 #  end_vignette()
+#  unlink(rirods:::path_to_irods_conf())
 

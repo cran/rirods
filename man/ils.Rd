@@ -9,8 +9,10 @@ ils(
   stat = FALSE,
   permissions = FALSE,
   metadata = FALSE,
-  offset = 0,
-  limit = 100,
+  offset = numeric(1),
+  limit = find_irods_file("max_number_of_rows_per_catalog_query"),
+  recurse = FALSE,
+  ticket = NULL,
   message = TRUE,
   verbose = FALSE
 )
@@ -27,12 +29,15 @@ Defaults to \code{FALSE}.}
 \item{metadata}{Whether metadata information should be included. Defaults to
 \code{FALSE}.}
 
-\item{offset}{Number of records to skip for pagination. Defaults to 0.}
+\item{offset}{Number of records to skip for pagination. Deprecated.}
 
-\item{limit}{Number of records to show per page. Defaults to 100.}
+\item{limit}{Number of records to show per page.}
 
-\item{message}{Whether a message should be printed when the collection is
-empty. Defaults to \code{TRUE}.}
+\item{recurse}{Recursively list. Defaults to \code{FALSE}.}
+
+\item{ticket}{A valid iRODS ticket string. Defaults to \code{NULL}.}
+
+\item{message}{Show message when empty collection. Default to \code{FALSE}.}
 
 \item{verbose}{Whether information should be printed about the HTTP request
 and response. Defaults to \code{FALSE}.}
@@ -48,12 +53,12 @@ access control information for each element in the collection.
 \examples{
 \dontshow{if (is_irods_demo_running()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 is_irods_demo_running()
-
-# demonstration server (requires Bash, Docker and Docker-compose)
-# use_irods_demo()
-
+\dontshow{
+.old_config_dir <- Sys.getenv("R_USER_CONFIG_DIR")
+Sys.setenv("R_USER_CONFIG_DIR" = tempdir())
+}
 # connect project to server
-create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
+\Sexpr[stage=build, results=rd]{paste0("create_irods(\"", rirods:::.irods_host, "\")")}
 
 # authenticate
 iauth("rods", "rods")
@@ -72,6 +77,9 @@ ils(metadata = TRUE)
 
 # delete `some_collection`
 irm("some_collection", force = TRUE, recursive = TRUE)
+\dontshow{
+Sys.setenv("R_USER_CONFIG_DIR" = .old_config_dir)
+}
 \dontshow{\}) # examplesIf}
 }
 \seealso{

@@ -18,7 +18,11 @@ knitr::opts_knit$set(
 options(knitr.kable.NA = "")
 
 ## ----setup2, include=FALSE----------------------------------------------------
-#  create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home", overwrite=TRUE)
+#  # set user config directory to temporary location
+#  withr::local_envvar(
+#    R_USER_CONFIG_DIR = tempdir()
+#  )
+#  eval(substitute(create_irods(x, overwrite = TRUE), list(x = rirods:::.irods_host)))
 #  iauth("rods", "rods")
 #  
 #  filter_ils <- function(pattern, ils_output = ils()) {
@@ -97,9 +101,9 @@ options(knitr.kable.NA = "")
 
 ## -----------------------------------------------------------------------------
 #  lm_meta <- data.frame(
-#      attribute = c("size", "size", "data_file", "model_type"),
-#      value = c(as.character(nrow(fake_data)), 1, data_path, "linear regression"),
-#      units= c("observations", "predictors", "", "")
+#    attribute = c("size", "size", "data_file", "model_type"),
+#    value = c(as.character(nrow(fake_data)), 1, data_path, "linear regression"),
+#    units = c("observations", "predictors", "", "")
 #  )
 #  lm_meta
 
@@ -120,10 +124,18 @@ options(knitr.kable.NA = "")
 #    type = c("dataframe", "lm"),
 #    responsible = c("abby", "bob")
 #  )
-#  pmap(file_md, function(path, type, responsible) {
+#  pwalk(file_md, function(path, type, responsible) {
 #    imeta(path, operations = list(
-#      list(operation = "add", attribute = "type", value = type),
-#      list(operation = "add", attribute = "responsible", value = responsible)
+#      list(
+#        operation = "add",
+#        attribute = "type",
+#        value = type
+#      ),
+#      list(
+#        operation = "add",
+#        attribute = "responsible",
+#        value = responsible
+#      )
 #    ))
 #  })
 
@@ -137,7 +149,6 @@ options(knitr.kable.NA = "")
 ## -----------------------------------------------------------------------------
 #  imeta(
 #    "analysis",
-#    "collection",
 #    operations = list(
 #      list(operation = "add", attribute = "dataset", value = data_path)
 #    ))
@@ -174,4 +185,5 @@ options(knitr.kable.NA = "")
 #    irm(file, recursive = TRUE)
 #  }
 #  httptest2::end_vignette()
+#  unlink(rirods:::path_to_irods_conf())
 

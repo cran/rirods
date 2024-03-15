@@ -7,7 +7,7 @@ This repository provides a docker-compose project designed to easily stand up a 
 ## Requirements
 
 - docker
-- docker-compose
+- docker compose
 
 A minimal configuration will have:
 
@@ -25,12 +25,12 @@ $ git submodule update --init
 
 To run all services:
 ```bash
-$ docker-compose up
+$ docker compose up
 ```
 
 To run an individual service (and all services on which it depends):
 ```bash
-$ docker-compose up <service-name>
+$ docker compose up <service-name>
 ```
 
 For example, this command will spawn containers for the following services:
@@ -42,7 +42,7 @@ For example, this command will spawn containers for the following services:
 5. `irods-client-zmt`
 
 ```bash
-$ docker-compose up irods_client_zmt
+$ docker compose up irods-client-zmt
 ```
 
 For more information about Compose CLI options, see Docker Compose documentation: https://docs.docker.com/engine/reference/commandline/compose
@@ -64,7 +64,7 @@ Once the service is running, the NFS server needs to be accessed from a mountpoi
 ```bash
 $ sudo mount -o sec=sys,port=2050 localhost:/ ./irods_client_nfsrods/nfs_mount
 ```
-The hostname can also be the IP address of the container providing the service in the `irods_demo_default` Docker network if running from the same host. The mountpoint can exist on any other machine which can reach the host running the container providing the service because the port is being exposed, in which case the FQDN or IP address for the host machine can be used. For more information about mounting NFSRODS, see the README for the project: https://github.com/irods/irods_client_nfsrods#mounting
+The hostname can also be the IP address of the container providing the service in the `irods-demo_default` Docker network if running from the same host. The mountpoint can exist on any other machine which can reach the host running the container providing the service because the port is being exposed, in which case the FQDN or IP address for the host machine can be used. For more information about mounting NFSRODS, see the README for the project: https://github.com/irods/irods_client_nfsrods#mounting
 
 When you are ready to stop the service, it would be a good idea to unmount first. This can be done by running the following:
 ```bash
@@ -73,5 +73,5 @@ $ sudo umount ./irods_client_nfsrods/nfs_mount
 
 The NFSRODS service maps the `/etc/passwd` file on the host machine to the `/etc/passwd` file in the container providing the service. The user(s) accessing the mountpoint will need to exist as iRODS users as well in order to be able to interact with the mountpoint. This can be done by running the following command on the host machine for each `username` which needs to be mapped:
 ```bash
-$ docker exec irods_demo_irods-client-icommands_1 iadmin mkuser <username> rodsuser
+$ docker exec irods-demo-irods-client-icommands-1 iadmin mkuser <username> rodsuser
 ```

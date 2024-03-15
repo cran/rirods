@@ -1,0 +1,10 @@
+{
+    "api_version": "0.2.0",
+    "build": "8da6c5794f04edab1290e429a0d1676e4452dd5c",
+    "genquery2_enabled": true,
+    "irods_zone": "tempZone",
+    "max_number_of_parallel_write_streams": 3,
+    "max_number_of_rows_per_catalog_query": 15,
+    "max_size_of_request_body_in_bytes": 8388608,
+    "openid_connect_enabled": false
+}

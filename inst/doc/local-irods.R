@@ -6,7 +6,7 @@ start_vignette("local-irods")
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval=is_irods_demo_running()
+  eval=FALSE
 )
 
 root_dir <- tempdir()
@@ -16,7 +16,11 @@ knitr::opts_knit$set(
 )
 
 ## ----setup2, include=FALSE----------------------------------------------------
-#  create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home", overwrite=TRUE)
+#  # set user config directory to temporary location
+#  withr::local_envvar(
+#    R_USER_CONFIG_DIR = root_dir
+#  )
+#  eval(substitute(create_irods(x, overwrite = TRUE), list(x = rirods:::.irods_host)))
 #  iauth("rods", "rods")
 #  
 #  if (length(ils())> 0) {
@@ -27,7 +31,6 @@ knitr::opts_knit$set(
 #  
 #  dir.create(file.path(root_dir, "data"))
 #  imkdir("data")
-#  
 
 ## -----------------------------------------------------------------------------
 #  getwd()
@@ -70,7 +73,7 @@ knitr::opts_knit$set(
 #  set.seed(1234)
 #  fake_data <- data.frame(x = rnorm(20, mean = 1))
 #  fake_data$y <- fake_data$x * 2 + 3 - rnorm(20, sd = 0.6)
-#  write.csv(fake_data, file.path("data", "data.csv"), row.names=FALSE)
+#  write.csv(fake_data, file.path("data", "data.csv"), row.names = FALSE)
 #  dir("data")
 
 ## ----include=FALSE------------------------------------------------------------
@@ -124,4 +127,5 @@ knitr::opts_knit$set(
 #  unlink(file.path(root_dir, "data"), recursive=TRUE)
 #  unlink(file.path(root_dir, "analysis"), recursive=TRUE)
 #  end_vignette()
+#  unlink(rirods:::path_to_irods_conf())
 

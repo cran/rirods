@@ -342,17 +342,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <div id="contributing-to-rirods-development" class="section level2">
 <h2>Contributing to rirods development</h2>
-<p>To contribute to rirods fork the source files from:
+<p>To contribute to <code>{rirods}</code> fork the source files from:
 https://github.com/irods/irods_client_library_rirods, and make a Pull
 Request.</p>
 </div>
 <div id="prerequisites-r" class="section level2">
 <h2>Prerequisites R</h2>
 <p>The following R packages are furthermore required for development:
-<code>xml2</code>, <code>jsonlite</code>, <code>readr</code>,
+<code>xml2</code>, <code>purrr</code>, <code>readr</code>,
 <code>testthat</code> (&gt;= 3.0.0), <code>knitr</code>,
-<code>rmarkdown</code>, <code>spelling</code>, and
-<code>httptest2</code>. For convenience, one can also use
+<code>rmarkdown</code>, <code>spelling</code>, <code>kableExtra</code>,
+and <code>httptest2</code>. For convenience, one can also use
 <code>renv</code> () and <code>renv::restore()</code> to install all
 dependencies. The <code>usethis</code> and the <code>devtools</code>
 packages are further suggestions to streamline development. See <a href="https://devtools.r-lib.org/">devtools</a> and <a href="https://usethis.r-lib.org/">usethis</a> for common development
@@ -366,24 +366,24 @@ in several directories under <code>tests/testthat/</code>.</p>
 <div id="prerequisites-irods" class="section level2">
 <h2>Prerequisites iRODS</h2>
 <p>The unit test included in the source files can either be run against
-a local or remote iRODS C++ REST API service, version 0.9.3 or later -
-https://github.com/irods/irods_client_rest_cpp.</p>
+a local or remote iRODS C++ HTTP API service -
+https://github.com/irods/irods_client_http_api.</p>
 <div id="local-server" class="section level3">
 <h3>Local server</h3>
-<p>Launch a local demonstration iRODS service (including the REST
+<p>Launch a local demonstration iRODS service (including the HTTP
 API):</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># clone the repository (and submodule &quot;irods_demo&quot;)</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># or use `git submodule update --init` when already cloned without submodules</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">--recurse-submodules</span> https://github.com/irods/irods_demo</span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># start the REST API</span></span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="bu">cd</span> irods_demo</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="ex">docker-compose</span> up <span class="at">-d</span> nginx-reverse-proxy</span></code></pre></div>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="ex">docker</span> compose up <span class="at">-d</span> nginx-reverse-proxy irods-client-http-api irods-client-icommands</span></code></pre></div>
 <p>Alternatively, one can use the R function
 <code>use_irods_demo()</code>.</p>
 <p>Note, that both options can only be used if Docker and the
 Docker-compose plugin are installed.</p>
-<p>This will result in the demonstration REST API running at
-<code>http://localhost/irods-rest/0.9.3</code> (or later version). No
+<p>This will result in the demonstration HTTP API running at
+http://localhost:9001/irods-http-api/0.2.0 (or later version). No
 further configuration in R is needed for development (except for
 removing possible mock files). For example, to run the unit tests
 against this local server use: <code>devtools::test()</code>.</p>
@@ -411,14 +411,12 @@ information. This information needs to be entered in the
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
 <span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co"># iRODS environment variables for development</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">DEV_HOST_IRODS =</span> <span class="st">&quot;nLO8T0IpHCT2kXklYE-IB0HjYpNkg5wN4ZKk7TPSvkwGf9FauDR-O5mVI-mmD2_zNFGLoaVcAgYl&quot;</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">DEV_ZONE_PATH_IRODS =</span> <span class="st">&quot;gunp5Ts08NHfpKAdbFCBuilVb7Wjnxojbt7bA1e-9Q&quot;</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">DEV_USER =</span> <span class="st">&quot;ZGlORquE2G6BIPS5JAcuPcngmBB6Wg&quot;</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">DEV_PASS =</span> <span class="st">&quot;ZGlORquE2G6BIPS5JAcuPcngmBB6Wg&quot;</span>)</span></code></pre></div>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">DEV_USER =</span> <span class="st">&quot;ZGlORquE2G6BIPS5JAcuPcngmBB6Wg&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">DEV_PASS =</span> <span class="st">&quot;ZGlORquE2G6BIPS5JAcuPcngmBB6Wg&quot;</span>)</span></code></pre></div>
 <p>The server information is stored in the environmental variables
-<code>DEV_HOST_IRODS</code> ,<code>DEV_ZONE_PATH_IRODS</code>,
-<code>DEV_USER</code>, and <code>DEV_PASS</code>. Server information is
-provided in scrambled format to prevent leakage of sensitive information
-to GitHub.</p>
+<code>DEV_HOST_IRODS</code> , <code>DEV_USER</code>, and
+<code>DEV_PASS</code>. Server information is provided in scrambled
+format to prevent leakage of sensitive information to GitHub.</p>
 <p>The following step are needed to scramble this information.</p>
 <ol style="list-style-type: decimal">
 <li>Generate package development key:</li>
@@ -437,14 +435,12 @@ the user level. For convenience one can use
 <code>httr2::secret_encrypt()</code>. For example, scramble the host
 name as follows:</li>
 </ol>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>httr2<span class="sc">::</span><span class="fu">secret_encrypt</span>(<span class="st">&quot;http://myserver/irods-rest/0.9.3&quot;</span> ,<span class="st">&quot;DEV_KEY_IRODS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>httr2<span class="sc">::</span><span class="fu">secret_encrypt</span>(<span class="st">&quot;http://localhost:9001/irods-http-api/0.1.0&quot;</span> ,<span class="st">&quot;DEV_KEY_IRODS&quot;</span>)</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li><p>Store the scrambled information at the designated places in the
 project level <code>.Rprofile</code>: host name under
-<code>DEV_HOST_IRODS</code>, zone path under
-<code>DEV_ZONE_PATH_IRODS</code> (e.g., <code>&quot;/tempZone/home&quot;</code>),
-user name under <code>DEV_USER</code>, and password under
-<code>DEV_PASS</code>.</p></li>
+<code>DEV_HOST_IRODS</code>, user name under <code>DEV_USER</code>, and
+password under <code>DEV_PASS</code>.</p></li>
 <li><p>Restart the R sessions (possibly with
 <code>CTRL + SHIFT + F10</code>).</p></li>
 </ol>

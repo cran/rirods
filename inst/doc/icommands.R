@@ -16,7 +16,11 @@ knitr::opts_knit$set(
 
 
 ## ----setup2, include=FALSE----------------------------------------------------
-#  create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home", overwrite=TRUE)
+#  # set user config directory to temporary location
+#  withr::local_envvar(
+#    R_USER_CONFIG_DIR = tempdir()
+#  )
+#  eval(substitute(create_irods(x, overwrite = TRUE), list(x = rirods:::.irods_host)))
 #  iauth("rods", "rods")
 #  if (length(ils())> 0) {
 #    for (file in ils()$logical_path) {
@@ -38,24 +42,24 @@ knitr::opts_knit$set(
 ## -----------------------------------------------------------------------------
 #  ils() # ils
 #  ils("some_collection") # ils some_collection
-#  ils("some_collection", stat=TRUE) # ils -l some_collection
-#  ils("some_collection", permissions=TRUE) # ils -A some_collection
-#  ils(permissions=TRUE, stat=TRUE) # ils -Al
+#  ils("some_collection", stat = TRUE) # ils -l some_collection
+#  ils("some_collection", permissions = TRUE) # ils -A some_collection
+#  ils(permissions=TRUE, stat = TRUE) # ils -Al
 
 ## -----------------------------------------------------------------------------
 #  filter_ils <- function(pattern, ils_output = ils()) {
 #    stopifnot(inherits(ils_output, "irods_df"))
 #    ils_df <- as.data.frame(ils_output)
 #    if (length(pattern) == 1) {
-#      filtered <- ils_df[grepl(pattern, ils_df$logical_path),]
+#      filtered <- ils_df[grepl(pattern, ils_df$logical_path), ]
 #    } else {
-#      filtered <- ils_df[basename(ils_df$logical_path) %in% pattern,]
+#      filtered <- ils_df[basename(ils_df$logical_path) %in% pattern, ]
 #    }
 #    rirods:::new_irods_df(filtered)
 #  }
 
 ## -----------------------------------------------------------------------------
-#  my_files <- ils("some_collection", metadata=TRUE)
+#  my_files <- ils("some_collection", metadata = TRUE)
 #  my_files
 #  filter_ils("random", my_files) # imeta ls -d some_collection/random_numbers.rds
 
@@ -90,7 +94,7 @@ knitr::opts_knit$set(
 #  ils(metadata=TRUE)
 #  
 #  # imeta add -C subcollection foo bar baz
-#  imeta("subcollection", "collection",
+#  imeta("subcollection",
 #        operations = list(
 #          list(operation="add", attribute="foo", value="bar", units="baz")
 #          )
@@ -122,10 +126,6 @@ knitr::opts_knit$set(
 #      irm(file, recursive = TRUE)
 #    }
 #  }
-#  if (length(ils("/tempZone/trash/home/rods"))> 0) {
-#    for (file in ils("/tempZone/trash/home/rods")$logical_path) {
-#      irm(file, recursive = TRUE)
-#    }
-#  }
 #  end_vignette()
+#  unlink(rirods:::path_to_irods_conf())
 

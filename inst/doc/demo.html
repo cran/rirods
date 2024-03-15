@@ -12,7 +12,7 @@
 
 <meta name="author" content="Mariana Montes" />
 
-<meta name="date" content="2023-11-02" />
+<meta name="date" content="2024-03-15" />
 
 <title>Use iRODS demo</title>
 
@@ -340,12 +340,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Use iRODS demo</h1>
 <h4 class="author">Mariana Montes</h4>
-<h4 class="date">2023-11-02</h4>
+<h4 class="date">2024-03-15</h4>
 
 
 
-<p>If you don’t have access to an iRODS server with the <a href="https://github.com/irods/irods_client_rest_cpp">iRODS REST API</a>
-installed, you can still try it out with a local demo on Linux or <a href="https://learn.microsoft.com/en-us/windows/wsl/install">WSL2</a>
+<p>If you don’t have access to an iRODS server with the <a href="https://github.com/irods/irods_client_http_api">iRODS C++ HTTP
+API</a> installed, you can still try it out with a local demo on Linux
+or <a href="https://learn.microsoft.com/en-us/windows/wsl/install">WSL2</a>
 (using Linux inside Windows).</p>
 <p>As initial requirements, you need bash, docker and the docker-compose
 plugin in your Linux distribution. You can check if they are installed
@@ -377,9 +378,8 @@ authenticate. Here we authenticate with the default “rods” account, but
 you could have another account as well; remember that running
 <code>iauth()</code> will open an interactive dialog to provide a
 username and password.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">create_irods</span>(<span class="st">&quot;http://localhost/irods-rest/0.9.3&quot;</span>, <span class="st">&quot;/tempZone/home&quot;</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">iauth</span>(<span class="st">&quot;rods&quot;</span>, <span class="st">&quot;rods&quot;</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">ils</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">iauth</span>(<span class="st">&quot;rods&quot;</span>, <span class="st">&quot;rods&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">ils</span>()</span></code></pre></div>
 <p>If you have any issues running the demo, check:</p>
 <ul>
 <li>that you are working from Linux (or WSL2)</li>

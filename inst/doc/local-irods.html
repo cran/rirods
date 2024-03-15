@@ -12,7 +12,7 @@
 
 <meta name="author" content="Mariana Montes" />
 
-<meta name="date" content="2023-11-02" />
+<meta name="date" content="2024-03-15" />
 
 <title>Accessing data locally and in iRODS</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Accessing data locally and in iRODS</h1>
 <h4 class="author">Mariana Montes</h4>
-<h4 class="date">2023-11-02</h4>
+<h4 class="date">2024-03-15</h4>
 
 
 
@@ -444,7 +444,7 @@ directory with <code>write.csv()</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>fake_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="at">mean =</span> <span class="dv">1</span>))</span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>fake_data<span class="sc">$</span>y <span class="ot">&lt;-</span> fake_data<span class="sc">$</span>x <span class="sc">*</span> <span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span> <span class="sc">-</span> <span class="fu">rnorm</span>(<span class="dv">20</span>, <span class="at">sd =</span> <span class="fl">0.6</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">write.csv</span>(fake_data, <span class="fu">file.path</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;data.csv&quot;</span>), <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">write.csv</span>(fake_data, <span class="fu">file.path</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;data.csv&quot;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">dir</span>(<span class="st">&quot;data&quot;</span>)</span></code></pre></div>
 <p>When saving data in iRODS, we don’t have these kinds of options.
 Instead, we can either transfer a file of any type from our local system

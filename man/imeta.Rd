@@ -8,6 +8,7 @@ imeta(
   logical_path,
   entity_type = c("data_object", "collection", "user"),
   operations = list(),
+  admin = FALSE,
   verbose = FALSE
 )
 }
@@ -15,7 +16,7 @@ imeta(
 \item{logical_path}{Path to the data object or collection (or name of the user).}
 
 \item{entity_type}{Type of item to add metadata to or remove it from.
-Options are 'data_object', 'collection' and 'user'.}
+Options are 'data_object', 'collection' and 'user'.  Deprecated.}
 
 \item{operations}{List of named lists or \link{data.frame} representing operations.
 The valid components of each of these lists or vectors are:
@@ -26,6 +27,8 @@ should be added to or removed from the metadata of the item (required).
 \item \code{value}, with the value of the AVU (required).
 \item \code{units}, with the unit of the AVU (optional).
 }}
+
+\item{admin}{Whether to grant admin rights. Defaults to \code{FALSE}.}
 
 \item{verbose}{Whether information should be printed about the HTTP request
 and response. Defaults to \code{FALSE}.}
@@ -46,9 +49,12 @@ is_irods_demo_running()
 
 # demonstration server (requires Bash, Docker and Docker-compose)
 # use_irods_demo()
-
+\dontshow{
+.old_config_dir <- Sys.getenv("R_USER_CONFIG_DIR")
+Sys.setenv("R_USER_CONFIG_DIR" = tempdir())
+}
 # connect project to server
-create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
+\Sexpr[stage=build, results=rd]{paste0("create_irods(\"", rirods:::.irods_host, "\")")}
 
 # authentication
 iauth("rods", "rods")
@@ -65,7 +71,6 @@ ils()
 # add some metadata
 imeta(
   "foo.rds",
-  "data_object",
    operations =
     list(
      list(operation = "add", attribute = "foo", value = "bar", units = "baz")
@@ -75,7 +80,6 @@ imeta(
 # `operations` can contain multiple tags supplied as a `data.frame`
 imeta(
   "foo.rds",
-  "data_object",
   operations = data.frame(
     operation = c("add", "add"),
     attribute = c("foo2", "foo3"),
@@ -87,7 +91,6 @@ imeta(
 # or again as a list of lists
 imeta(
   "foo.rds",
-  "data_object",
   operations = list(
     list(operation = "add", attribute = "foo4", value = "bar4", units = "baz4"),
     list(operation = "add", attribute = "foo5", value = "bar5", units = "baz5")
@@ -97,7 +100,6 @@ imeta(
 # list of lists are useful as AVUs don't have to contain units
 imeta(
   "foo.rds",
-  "data_object",
   operations = list(
     list(operation = "add", attribute = "foo6", value = "bar6"),
     list(operation = "add", attribute = "foo7", value = "bar7", units = "baz7")
@@ -109,6 +111,9 @@ ils(metadata = TRUE)
 
 # delete object
 irm("foo.rds", force = TRUE)
+\dontshow{
+Sys.setenv("R_USER_CONFIG_DIR" = .old_config_dir)
+}
 \dontshow{\}) # examplesIf}
 }
 \references{

@@ -1,17 +1,50 @@
 function (response) {
 
+  grep_json_body_element <- function(response, element) {
+    response_R_body <- jsonlite::fromJSON(rawToChar(response$body))
+    response_R_body[[element]] <- character(1)
+    response$body <- charToRaw(jsonlite::toJSON(response_R_body,  auto_unbox = TRUE))
+    response
+  }
+
   # mask host in headers
   response$url <- gsub(rirods:::find_irods_file("host"), "", response$url, fixed = TRUE)
 
-  # change body upon PUT when type is raw (`iput()` and `isaverds()`)
-  type_body <- try(response$body$type, silent = TRUE)
-  if (!inherits(type_body, "try-error") && !is.null(type_body) && type_body == "raw" && response$method == "PUT") {
-    response$body$data <- NULL
-    response
-  # make sure that `ils()` calls that error have no content body
-  } else if (length(response) == 5 && httr2::resp_is_error(response) && httr2::resp_status(response) >= 400L) {
-    within_body_text(response, function(x) gsub(".", "", x))
-  } else {
-    response
+  # mask dates in headers
+  response$headers$Date <- ""
+
+  if (inherits(response, "httr2_response")) {
+    if (grepl("op=stat", response$request$url)) {
+      response <- grep_json_body_element(response, "modified_at") # stat
+    }
+    if (response$method == "GET" && grepl("query", response$url) && grepl("CREATE_TIME", response$url)) {
+      # response <- grep_json_body_element(response, "rows") needs refinement
+    }
+    is_body_data_operation <- response$request$body$data$op
+    if (!is.null(is_body_data_operation)) {
+      if (response$method != "GET" && is_body_data_operation == "parallel_write_init") {
+        response <- grep_json_body_element(response, "parallel_write_handle") # mask token for init and shutdown
+      }
+      if (response$method != "GET" && is_body_data_operation == "parallel_write_shutdown") {
+        response$request$body$data$`parallel-write-handle` <- character(1)
+      }
+    }
+    response$request$headers$Authorization  <- "" # token
   }
+
+  if (inherits(response, "httr2_request")) {
+    is_body_data_operation <- response$body$data$op
+    if (!is.null(is_body_data_operation)) {
+      if (inherits(response$body$data$bytes,  "form_data")) {
+        # change body upon PUT when type is raw (`iput()` and `isaverds()`)
+        response$body$data <- NULL
+      } else if (response$method != "GET" && is_body_data_operation == "parallel_write_shutdown") {
+        response$body$data$`parallel-write-handle` <- character(1)
+      }
+    }
+  }
+
+  response
 }
+
+

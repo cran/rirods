@@ -1,36 +1,36 @@
+get_server_info <- function(verbose =  FALSE) {
+  irods_http_call("info", "GET", list(), verbose = verbose) |>
+    httr2::req_perform() |>
+    httr2::resp_body_json()
+}
+
 has_irods_conf <- function() {
   file.exists(path_to_irods_conf())
 }
 
 # create package configuration directory
 create_config_dir <- function(path_to_config_dir) {
-
   if (!dir.exists(path_to_config_dir)) {
-    # windows uses author name and app name as path
-    if (Sys.info()[["sysname"]] == "Windows") {
-      dir.create(dirname(path_to_config_dir))
-    }
-    dir.create(path_to_config_dir)
+    dir.create(path_to_config_dir, recursive = TRUE)
   }
 }
 
 path_to_irods_conf <- function() {
   path_to_config_dir <- rappdirs::user_config_dir("rirods")
   create_config_dir(path_to_config_dir)
-  file.path(path_to_config_dir, "conf.irods")
+  file.path(path_to_config_dir, "conf-irods.json")
 }
 
-find_irods_file <- function(what) {
+find_irods_file <- function(what = NULL) {
 
   check_irods_conf()
-  # find iRODS configuration file
-  irods_conf_file <- path_to_irods_conf()
   # read irods file
-  x <- readLines(irods_conf_file)
+  x <- jsonlite::fromJSON(path_to_irods_conf())
   # find line
-  x <- x[grepl(what, x)]
-  # extract information
-  sub(paste0(what, ": "), "", x)
+  if (!is.null(what))
+    x[[what]]
+  else
+    x
 }
 
 check_irods_conf <- function() {
@@ -44,9 +44,10 @@ check_irods_conf <- function() {
   }
 
   # check content
-  if (length(readLines(irods_conf_file)) < 2) {
-    stop("iRODS configuration file is incomplete. Did you supply the correct ",
-         "host and/or zone name with `create_irods()`?", call. = FALSE)
+  content <- try(jsonlite::fromJSON(path_to_irods_conf()), silent = TRUE)
+  if (inherits(content, "try-error") || length(content) < 1) {
+    stop("iRODS configuration file is corrupted. Create a new configuration ",
+         "file with `create_irods()`?", call. = FALSE)
   }
 
   invisible(irods_conf_file)

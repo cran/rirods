@@ -12,7 +12,7 @@ use_irods_demo(
   verbose = TRUE
 )
 
-stop_irods_demo()
+stop_irods_demo(verbose = TRUE)
 }
 \arguments{
 \item{user}{Character vector for user name (defaults to "rods" admin)}
@@ -37,7 +37,6 @@ These functions are untested on Windows and macOS and require:
 \itemize{
 \item \code{bash}
 \item \code{docker}
-\item \code{docker-compose}
 }
 }
 \examples{

@@ -4,7 +4,7 @@
 \alias{iauth}
 \title{Authentication Service for an iRODS Zone}
 \usage{
-iauth(user = NULL, password = NULL, role = "rodsuser")
+iauth(user, password = NULL, role = "rodsuser")
 }
 \arguments{
 \item{user}{iRODS user name (prompts user for user name if not supplied).}
@@ -27,11 +27,17 @@ is_irods_demo_running()
 
 # demonstration server (requires Bash, Docker and Docker-compose)
 # use_irods_demo()
-
+\dontshow{
+.old_config_dir <- Sys.getenv("R_USER_CONFIG_DIR")
+Sys.setenv("R_USER_CONFIG_DIR" = tempdir())
+}
 # connect project to server
-create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
+\Sexpr[stage=build, results=rd]{paste0("create_irods(\"", rirods:::.irods_host, "\")")}
 
 # authenticate
 iauth("rods", "rods")
+\dontshow{
+Sys.setenv("R_USER_CONFIG_DIR" = .old_config_dir)
+}
 \dontshow{\}) # examplesIf}
 }

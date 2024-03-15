@@ -14,7 +14,7 @@ The rirods package is an R client for iRODS.
 
 ## Installation
 
-You can install the development version of rirods like so:
+You can install the latest CRAN version of rirods like so:
 
 ``` r
 install.packages("rirods")
@@ -29,10 +29,10 @@ devtools::install_github("irods/irods_client_library_rirods")
 
 ## Prerequisites
 
-This package connects to the iRODS C++ REST API -
-https://github.com/irods/irods_client_rest_cpp.
+This package connects to the iRODS C++ HTTP API -
+https://github.com/irods/irods_client_http_api.
 
-Launch a local demonstration iRODS service (including the REST API):
+Launch a local demonstration iRODS service (including the HTTP API):
 
 ``` r
 # load
@@ -41,8 +41,8 @@ library(rirods)
 use_irods_demo("alice", "passWORD")
 ```
 
-This will result in the demonstration REST API running at
-`http://localhost/irods-rest/0.9.3` (or later version).
+This will result in the demonstration HTTP API running at
+http://localhost:9001/irods-http-api/0.2.0.
 
 These Docker containers are designed to easily stand up a
 **DEMONSTRATION** of the iRODS server. It is intended for education and
@@ -52,25 +52,21 @@ exploration. (See also `vignette("demo")`.)
 
 ## Example Usage
 
-To connect to the REST API endpoint of your choice, load `rirods`,
+To connect to the HTTP API endpoint of your choice, load `rirods`,
 connect with `create_irods()`, and authenticate with your iRODS
 credentials:
 
-``` r
-# connect
-create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
-```
+    create_irods("http://localhost:9001/irods-http-api/0.2.0")
 
 ### Authentication
 
 In this example Alice is a user of iRODS and she can authenticate
-herself with `iauth()`. This prompts a dialog where you can enter your
-username and password without hardcoding this information in your
-scripts.
+herself with `iauth("alice")`. This prompts a dialog where you can enter
+your password without hardcoding this information in your scripts.
 
 ``` r
 # login as alice with password "passWORD"
-iauth() # or iauth("alice", "passWORD")
+iauth("alice") # or iauth("alice", "passWORD")
 ```
 
 ### Save R objects
@@ -99,7 +95,6 @@ describes the data object “foo”:
 # add some metadata
 imeta(
   "foo.rds", 
-  "data_object", 
   operations = 
     data.frame(operation = "add", attribute = "foo", value = "bar", units = "baz")
 )
@@ -107,19 +102,11 @@ imeta(
 # check if file is stored with associated metadata
 ils(metadata = TRUE)
 #> 
-#> ========
-#> metadata
-#> ========
-#> /tempZone/home/alice/foo.rds :
-#>  attribute value units
-#>        foo   bar   baz
-#> 
-#> 
 #> ==========
 #> iRODS Zone
 #> ==========
-#>                  logical_path        type
-#>  /tempZone/home/alice/foo.rds data_object
+#>                  logical_path attribute value units
+#>  /tempZone/home/alice/foo.rds       foo   bar   baz
 ```
 
 For more on using metadata, check out `vignette("metadata")`.
@@ -159,9 +146,9 @@ ils()
 #> ==========
 #> iRODS Zone
 #> ==========
-#>                  logical_path        type
-#>  /tempZone/home/alice/foo.csv data_object
-#>  /tempZone/home/alice/foo.rds data_object
+#>                  logical_path
+#>  /tempZone/home/alice/foo.csv
+#>  /tempZone/home/alice/foo.rds
 ```
 
 Later on somebody else might want to download this file again and store

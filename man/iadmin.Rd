@@ -5,33 +5,21 @@
 \title{The Administration Interface to iRODS}
 \usage{
 iadmin(
-  action,
-  target,
-  arg2 = character(1),
-  arg3 = character(1),
-  arg4 = character(1),
-  arg5 = character(1),
-  arg6 = character(1),
-  arg7 = character(1),
+  name,
+  password = character(1),
+  action = c("create_user", "set_password", "remove_user"),
+  role = c("rodsuser", "groupadmin", "rodsadmin"),
   verbose = FALSE
 )
 }
 \arguments{
-\item{action}{The action: add, modify, or remove.}
+\item{name}{Name of user to be added.}
 
-\item{target}{The subject of the action: user, zone, resource, childtoresc,}
+\item{password}{Password to be added.}
 
-\item{arg2}{arg2}
+\item{action}{The action: \code{"create_user"}, \code{"remove_user"}, or \code{"set_password"}.}
 
-\item{arg3}{arg3}
-
-\item{arg4}{arg4}
-
-\item{arg5}{arg5}
-
-\item{arg6}{arg6}
-
-\item{arg7}{arg7}
+\item{role}{Role of user: \code{"rodsuser"}, \code{"groupadmin"}, and \code{"groupadmin"}.}
 
 \item{verbose}{Show information about the http request and response.
 Defaults to \code{FALSE}.}
@@ -48,21 +36,26 @@ is_irods_demo_running()
 
 # demonstration server (requires Bash, Docker and Docker-compose)
 # use_irods_demo()
-
+\dontshow{
+.old_config_dir <- Sys.getenv("R_USER_CONFIG_DIR")
+Sys.setenv("R_USER_CONFIG_DIR" = tempdir())
+}
 # connect project to server
-create_irods("http://localhost/irods-rest/0.9.3", "/tempZone/home")
+\Sexpr[stage=build, results=rd]{paste0("create_irods(\"", rirods:::.irods_host, "\")")}
 
 # authentication
 iauth("rods", "rods")
 
 # add user
-iadmin(action = "add", target = "user", arg2 = "Bob", arg3 = "rodsuser")
+iadmin("Alice", action = "create_user", role = "rodsuser")
 
 # add user password
-iadmin(action = "modify", target = "user", arg2 = "Bob", arg3 = "password",
-  arg4 = "pass")
+iadmin("Alice", "pass", action = "set_password",  role = "rodsuser")
 
 # delete user
-iadmin(action = "remove", target = "user", arg2 = "Bob")
+iadmin("Alice", action = "remove_user", role = "rodsuser")
+\dontshow{
+Sys.setenv("R_USER_CONFIG_DIR" = .old_config_dir)
+}
 \dontshow{\}) # examplesIf}
 }
