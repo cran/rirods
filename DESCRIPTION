@@ -1,8 +1,9 @@
 Package: rirods
 Title: R Client for 'iRODS'
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(
-    person("Martin", "Schobben", , "schobbenmartin@gmail.com", role = c("aut", "cre", "cph"),
+    person("iRODS Consortium", email = "support@irods.org", role = c("cre", "cph")),
+    person("Martin", "Schobben", email = "schobbenmartin@gmail.com", role = "aut",
            comment = c(ORCID = "0000-0001-8560-0037")),
     person("Mariana", "Montes", role = "aut"),
     person("Terrell", "Russell", role = "ctb"),
@@ -36,14 +37,14 @@ RoxygenNote: 7.3.1
 SystemRequirements: iRODS C++ HTTP API 0.2.0
         (<https://github.com/irods/irods_client_http_api>)
 NeedsCompilation: no
-Packaged: 2024-03-15 18:13:49 UTC; nicola
-Author: Martin Schobben [aut, cre, cph]
-    (<https://orcid.org/0000-0001-8560-0037>),
+Packaged: 2026-07-19 14:57:16 UTC; root
+Author: iRODS Consortium [cre, cph],
+  Martin Schobben [aut] (ORCID: <https://orcid.org/0000-0001-8560-0037>),
   Mariana Montes [aut],
   Terrell Russell [ctb],
   Christine Staiger [ctb],
   Ton Smeele [ctb],
   Alan King [ctb]
-Maintainer: Martin Schobben <schobbenmartin@gmail.com>
+Maintainer: iRODS Consortium <support@irods.org>
 Repository: CRAN
-Date/Publication: 2024-03-15 18:30:02 UTC
+Date/Publication: 2026-07-19 15:40:08 UTC

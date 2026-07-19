@@ -16,116 +16,116 @@ knitr::opts_knit$set(
 
 
 ## ----setup2, include=FALSE----------------------------------------------------
-#  # set user config directory to temporary location
-#  withr::local_envvar(
-#    R_USER_CONFIG_DIR = tempdir()
-#  )
-#  eval(substitute(create_irods(x, overwrite = TRUE), list(x = rirods:::.irods_host)))
-#  iauth("rods", "rods")
-#  if (length(ils())> 0) {
-#    for (file in ils()$logical_path) {
-#      irm(file, recursive = TRUE)
-#    }
-#  }
-#  imkdir("some_collection")
-#  x <- rnorm(100)
-#  isaveRDS(x, "some_collection/random_numbers.rds")
-#  imkdir("some_collection/subcollection")
-#  imeta("some_collection/random_numbers.rds",
-#        operations = list(
-#          list(operation="add", attribute="length", value="100", units="items"),
-#          list(operation="add", attribute="distribution", value="normal")
-#        ))
-#  y <- rnorm(200)
-#  isaveRDS(y, "200numbers.rds")
+# # set user config directory to temporary location
+# withr::local_envvar(
+#   R_USER_CONFIG_DIR = tempdir()
+# )
+# eval(substitute(create_irods(x, overwrite = TRUE), list(x = rirods:::.irods_host)))
+# iauth("rods", "rods")
+# if (length(ils())> 0) {
+#   for (file in ils()$logical_path) {
+#     irm(file, recursive = TRUE)
+#   }
+# }
+# imkdir("some_collection")
+# x <- rnorm(100)
+# isaveRDS(x, "some_collection/random_numbers.rds")
+# imkdir("some_collection/subcollection")
+# imeta("some_collection/random_numbers.rds",
+#       operations = list(
+#         list(operation="add", attribute="length", value="100", units="items"),
+#         list(operation="add", attribute="distribution", value="normal")
+#       ))
+# y <- rnorm(200)
+# isaveRDS(y, "200numbers.rds")
 
 ## -----------------------------------------------------------------------------
-#  ils() # ils
-#  ils("some_collection") # ils some_collection
-#  ils("some_collection", stat = TRUE) # ils -l some_collection
-#  ils("some_collection", permissions = TRUE) # ils -A some_collection
-#  ils(permissions=TRUE, stat = TRUE) # ils -Al
+# ils() # ils
+# ils("some_collection") # ils some_collection
+# ils("some_collection", stat = TRUE) # ils -l some_collection
+# ils("some_collection", permissions = TRUE) # ils -A some_collection
+# ils(permissions=TRUE, stat = TRUE) # ils -Al
 
 ## -----------------------------------------------------------------------------
-#  filter_ils <- function(pattern, ils_output = ils()) {
-#    stopifnot(inherits(ils_output, "irods_df"))
-#    ils_df <- as.data.frame(ils_output)
-#    if (length(pattern) == 1) {
-#      filtered <- ils_df[grepl(pattern, ils_df$logical_path), ]
-#    } else {
-#      filtered <- ils_df[basename(ils_df$logical_path) %in% pattern, ]
-#    }
-#    rirods:::new_irods_df(filtered)
-#  }
+# filter_ils <- function(pattern, ils_output = ils()) {
+#   stopifnot(inherits(ils_output, "irods_df"))
+#   ils_df <- as.data.frame(ils_output)
+#   if (length(pattern) == 1) {
+#     filtered <- ils_df[grepl(pattern, ils_df$logical_path), ]
+#   } else {
+#     filtered <- ils_df[basename(ils_df$logical_path) %in% pattern, ]
+#   }
+#   rirods:::new_irods_df(filtered)
+# }
 
 ## -----------------------------------------------------------------------------
-#  my_files <- ils("some_collection", metadata = TRUE)
-#  my_files
-#  filter_ils("random", my_files) # imeta ls -d some_collection/random_numbers.rds
+# my_files <- ils("some_collection", metadata = TRUE)
+# my_files
+# filter_ils("random", my_files) # imeta ls -d some_collection/random_numbers.rds
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  imkdir("new_collection") # imkdir new_collection
-#  ils()
-#  
-#  # imkdir -p another_collection/subcollection
-#  imkdir("another_collection/subcollection", create_parent_collections = TRUE)
-#  
-#  ils()
-#  ils("another_collection")
+# imkdir("new_collection") # imkdir new_collection
+# ils()
+# 
+# # imkdir -p another_collection/subcollection
+# imkdir("another_collection/subcollection", create_parent_collections = TRUE)
+# 
+# ils()
+# ils("another_collection")
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  irm("200numbers.rds", force = FALSE) # irm 200numbers.rds
-#  ils("/tempZone/trash/home/rods")
-#  
-#  irm("another_collection", force = TRUE, recursive = TRUE) # irm -rf another_collection
-#  iquery("SELECT COLL_NAME WHERE COLL_NAME LIKE '%_collection'")
+# irm("200numbers.rds", force = FALSE) # irm 200numbers.rds
+# ils("/tempZone/trash/home/rods")
+# 
+# irm("another_collection", force = TRUE, recursive = TRUE) # irm -rf another_collection
+# iquery("SELECT COLL_NAME WHERE COLL_NAME LIKE '%_collection'")
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  icd("some_collection")
-#  ils(metadata=TRUE)
-#  
-#  # imeta add -C subcollection foo bar baz
-#  imeta("subcollection",
-#        operations = list(
-#          list(operation="add", attribute="foo", value="bar", units="baz")
-#          )
-#        )
-#  
-#  # imeta rm -d random_numbers.rds distribution normal
-#  imeta("random_numbers.rds",
-#        operations = list(
-#          list(operation="remove", attribute="distribution", value="normal")
-#        ))
-#  
-#  ils(metadata=TRUE)
+# icd("some_collection")
+# ils(metadata=TRUE)
+# 
+# # imeta add -C subcollection foo bar baz
+# imeta("subcollection",
+#       operations = list(
+#         list(operation="add", attribute="foo", value="bar", units="baz")
+#         )
+#       )
+# 
+# # imeta rm -d random_numbers.rds distribution normal
+# imeta("random_numbers.rds",
+#       operations = list(
+#         list(operation="remove", attribute="distribution", value="normal")
+#       ))
+# 
+# ils(metadata=TRUE)
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  # imeta mod -d random_numbers.rds length 100 items u:elements
-#  imeta("random_numbers.rds",
-#        operations = list(
-#          list(operation="remove", attribute="length", value="100", units="items"),
-#          list(operation="add", attribute="length", value="100", units="elements")
-#        ))
-#  ils(metadata=TRUE)
+# # imeta mod -d random_numbers.rds length 100 items u:elements
+# imeta("random_numbers.rds",
+#       operations = list(
+#         list(operation="remove", attribute="length", value="100", units="items"),
+#         list(operation="add", attribute="length", value="100", units="elements")
+#       ))
+# ils(metadata=TRUE)
 
 ## ----cleanup, include=FALSE---------------------------------------------------
-#  if (length(ils())> 0) {
-#    for (file in ils()$logical_path) {
-#      irm(file, recursive = TRUE)
-#    }
-#  }
-#  end_vignette()
-#  unlink(rirods:::path_to_irods_conf())
+# if (length(ils())> 0) {
+#   for (file in ils()$logical_path) {
+#     irm(file, recursive = TRUE)
+#   }
+# }
+# end_vignette()
+# unlink(rirods:::path_to_irods_conf())
 

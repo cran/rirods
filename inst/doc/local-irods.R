@@ -16,116 +16,116 @@ knitr::opts_knit$set(
 )
 
 ## ----setup2, include=FALSE----------------------------------------------------
-#  # set user config directory to temporary location
-#  withr::local_envvar(
-#    R_USER_CONFIG_DIR = root_dir
-#  )
-#  eval(substitute(create_irods(x, overwrite = TRUE), list(x = rirods:::.irods_host)))
-#  iauth("rods", "rods")
-#  
-#  if (length(ils())> 0) {
-#    for (file in ils()$logical_path) {
-#      irm(file, recursive = TRUE, force=TRUE)
-#    }
-#  }
-#  
-#  dir.create(file.path(root_dir, "data"))
-#  imkdir("data")
+# # set user config directory to temporary location
+# withr::local_envvar(
+#   R_USER_CONFIG_DIR = root_dir
+# )
+# eval(substitute(create_irods(x, overwrite = TRUE), list(x = rirods:::.irods_host)))
+# iauth("rods", "rods")
+# 
+# if (length(ils())> 0) {
+#   for (file in ils()$logical_path) {
+#     irm(file, recursive = TRUE, force=TRUE)
+#   }
+# }
+# 
+# dir.create(file.path(root_dir, "data"))
+# imkdir("data")
 
 ## -----------------------------------------------------------------------------
-#  getwd()
-#  ipwd()
+# getwd()
+# ipwd()
 
 ## -----------------------------------------------------------------------------
-#  dir()
-#  ils()
+# dir()
+# ils()
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  old_local <- setwd("data")
-#  dir()
-#  old_irods <- icd("data")
-#  ils()
+# old_local <- setwd("data")
+# dir()
+# old_irods <- icd("data")
+# ils()
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  setwd(old_local)
-#  getwd()
-#  
-#  icd(old_irods)
-#  ipwd()
+# setwd(old_local)
+# getwd()
+# 
+# icd(old_irods)
+# ipwd()
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  dir.create("analysis")
-#  dir()
-#  
-#  imkdir("analysis")
-#  ils()
+# dir.create("analysis")
+# dir()
+# 
+# imkdir("analysis")
+# ils()
 
 ## -----------------------------------------------------------------------------
-#  set.seed(1234)
-#  fake_data <- data.frame(x = rnorm(20, mean = 1))
-#  fake_data$y <- fake_data$x * 2 + 3 - rnorm(20, sd = 0.6)
-#  write.csv(fake_data, file.path("data", "data.csv"), row.names = FALSE)
-#  dir("data")
+# set.seed(1234)
+# fake_data <- data.frame(x = rnorm(20, mean = 1))
+# fake_data$y <- fake_data$x * 2 + 3 - rnorm(20, sd = 0.6)
+# write.csv(fake_data, file.path("data", "data.csv"), row.names = FALSE)
+# dir("data")
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  iput("data/data.csv", "data/data_from_local.csv")
-#  ils("data")
+# iput("data/data.csv", "data/data_from_local.csv")
+# ils("data")
 
 ## -----------------------------------------------------------------------------
-#  m <- lm(y ~ x, data = fake_data)
-#  m
+# m <- lm(y ~ x, data = fake_data)
+# m
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  isaveRDS(m, "analysis/linear_model.rds")
-#  ils("analysis")
-#  dir("analysis") # nothing was saved locally
+# isaveRDS(m, "analysis/linear_model.rds")
+# ils("analysis")
+# dir("analysis") # nothing was saved locally
 
 ## -----------------------------------------------------------------------------
-#  iget("data/data_from_local.csv", "data/data_from_irods.csv")
-#  dir("data")
-#  read.csv("data/data_from_irods.csv") # same as fake_data
+# iget("data/data_from_local.csv", "data/data_from_irods.csv")
+# dir("data")
+# read.csv("data/data_from_irods.csv") # same as fake_data
 
 ## -----------------------------------------------------------------------------
-#  # copy locally first
-#  iget("analysis/linear_model.rds", "analysis/linear_model_in_local.rds")
-#  dir("analysis")
-#  readRDS("analysis/linear_model_in_local.rds")
-#  
-#  # or read directly from iRODS
-#  ireadRDS("analysis/linear_model.rds")
+# # copy locally first
+# iget("analysis/linear_model.rds", "analysis/linear_model_in_local.rds")
+# dir("analysis")
+# readRDS("analysis/linear_model_in_local.rds")
+# 
+# # or read directly from iRODS
+# ireadRDS("analysis/linear_model.rds")
 
 ## ----include=FALSE------------------------------------------------------------
-#  change_state()
+# change_state()
 
 ## -----------------------------------------------------------------------------
-#  unlink("analysis", recursive = TRUE)
-#  dir()
-#  
-#  irm("data", recursive = TRUE, force = TRUE)
-#  ils()
+# unlink("analysis", recursive = TRUE)
+# dir()
+# 
+# irm("data", recursive = TRUE, force = TRUE)
+# ils()
 
 ## ----cleanup, include=FALSE---------------------------------------------------
-#  change_state()
-#  for (file in ils()$logical_path) {
-#    irm(file, recursive = TRUE, force=TRUE)
-#  }
-#  unlink(file.path(root_dir, "data"), recursive=TRUE)
-#  unlink(file.path(root_dir, "analysis"), recursive=TRUE)
-#  end_vignette()
-#  unlink(rirods:::path_to_irods_conf())
+# change_state()
+# for (file in ils()$logical_path) {
+#   irm(file, recursive = TRUE, force=TRUE)
+# }
+# unlink(file.path(root_dir, "data"), recursive=TRUE)
+# unlink(file.path(root_dir, "analysis"), recursive=TRUE)
+# end_vignette()
+# unlink(rirods:::path_to_irods_conf())
 
