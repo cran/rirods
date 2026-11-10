@@ -8,10 +8,13 @@ Codecov
 GenQuery
 GeneralQuery
 Genquery
+Hostname
 IRODS
 POSIXct
 RStudio
 WSL
+api
+bec
 behaviour
 csv
 datetime
@@ -34,7 +37,6 @@ iquest
 irectory
 irods
 macOS
-maintainership
 modelled
 modelling
 myfile
